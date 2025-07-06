@@ -1,5 +1,5 @@
 import json
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext, CallbackQueryHandler
 
 TOKEN = "7336765866:AAEVhmNyhP3TVml9psl_WJ4r9FneZPiNb9E"
@@ -21,13 +21,20 @@ def save_config(text):
 async def start(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     if await is_user_in_channel(context, user_id):
-        buttons = [
-            [InlineKeyboardButton("📥 دریافت کانفیگ", callback_data="get_config")],
-            [InlineKeyboardButton("✉️ ارتباط با ادمین", callback_data="contact_admin")]
-        ]
-        await update.message.reply_text("به ربات خوش اومدی. یکی از گزینه‌ها رو انتخاب کن:", reply_markup=InlineKeyboardMarkup(buttons))
+        reply_markup = ReplyKeyboardMarkup(
+            [["📡 دریافت کانفیگ", "📨 ارتباط با ادمین"]],
+            resize_keyboard=True
+        )
+        await update.message.reply_text("به ربات خوش اومدی. از دکمه‌های پایین استفاده کن:", reply_markup=reply_markup)
     else:
-        await update.message.reply_text(f"برای استفاده از ربات ابتدا عضو کانال {CHANNEL_USERNAME} شوید و سپس /start را بزنید.")
+        buttons = [
+            [InlineKeyboardButton("📢 ورود به کانال", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}")],
+            [InlineKeyboardButton("✅ بررسی عضویت", callback_data="check_join")]
+        ]
+        await update.message.reply_text(
+            "برای استفاده از ربات لطفاً ابتدا وارد کانال زیر شوید 👇\nسپس روی دکمه «بررسی عضویت» کلیک کنید.",
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
 
 async def is_user_in_channel(context, user_id):
     try:
@@ -41,22 +48,37 @@ async def button_handler(update: Update, context: CallbackContext):
     user_id = query.from_user.id
     await query.answer()
 
-    if query.data == "get_config":
+    if query.data == "check_join":
+        if await is_user_in_channel(context, user_id):
+            reply_markup = ReplyKeyboardMarkup(
+                [["📡 دریافت کانفیگ", "📨 ارتباط با ادمین"]],
+                resize_keyboard=True
+            )
+            await query.message.reply_text("✅ عضویت شما تأیید شد. از دکمه‌های پایین استفاده کن:", reply_markup=reply_markup)
+        else:
+            await query.message.reply_text("⛔ هنوز عضو کانال نیستید. لطفاً ابتدا عضو شوید و دوباره امتحان کنید.")
+
+async def forward_to_admin(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    text = update.message.text
+
+    if text == "📡 دریافت کانفیگ":
         if await is_user_in_channel(context, user_id):
             config = load_config()
             if config:
-                await query.message.reply_text(f"📦 کانفیگ فعلی:\n\n{config}")
+                await update.message.reply_text(f"📦 کانفیگ فعلی:
+
+{config}")
             else:
-                await query.message.reply_text("❌ هنوز هیچ کانفیگی ثبت نشده.")
+                await update.message.reply_text("❌ هنوز هیچ کانفیگی ثبت نشده.")
         else:
-            await query.message.reply_text(f"ابتدا عضو کانال {CHANNEL_USERNAME} شوید.")
+            await update.message.reply_text(f"⛔ ابتدا عضو کانال {CHANNEL_USERNAME} شوید.")
+    elif text == "📨 ارتباط با ادمین":
+        await update.message.reply_text("پیامت رو بفرست تا به ادمین فوروارد بشه.")
+    else:
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"📩 پیام از کاربر: {update.effective_user.full_name} 👤 ID: {update.effective_user.id}
 
-    elif query.data == "contact_admin":
-        await query.message.reply_text("پیامت رو بفرست تا به ادمین فوروارد بشه.")
-
-async def forward_to_admin(update: Update, context: CallbackContext):
-    if update.message.text:
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f"📩 پیام از کاربر: {update.effective_user.full_name} 👤 ID: {update.effective_user.id}\n\n{update.message.text}")
+{text}")
         await update.message.reply_text("✅ پیامت ارسال شد. منتظر پاسخ باش.")
 
 async def admin_reply(update: Update, context: CallbackContext):
@@ -64,12 +86,16 @@ async def admin_reply(update: Update, context: CallbackContext):
         lines = update.message.reply_to_message.text.split("ID:")
         if len(lines) > 1:
             target_id = int(lines[1].split()[0])
-            await context.bot.send_message(chat_id=target_id, text=f"📨 پاسخ ادمین:\n\n{update.message.text}")
+            await context.bot.send_message(chat_id=target_id, text=f"📨 پاسخ ادمین:
+
+{update.message.text}")
     elif update.message.text.startswith("/add "):
         save_config(update.message.text[5:])
         await update.message.reply_text("✅ کانفیگ ذخیره شد.")
     elif update.message.text == "/get":
-        await update.message.reply_text(f"📦 آخرین کانفیگ:\n\n{load_config()}")
+        await update.message.reply_text(f"📦 آخرین کانفیگ:
+
+{load_config()}")
     elif update.message.text == "/delete":
         save_config("")
         await update.message.reply_text("🗑️ کانفیگ حذف شد.")
