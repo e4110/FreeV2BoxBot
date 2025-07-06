@@ -82,9 +82,7 @@ async def admin_reply(update: Update, context: CallbackContext):
         lines = update.message.reply_to_message.text.split("ID:")
         if len(lines) > 1:
             target_id = int(lines[1].split()[0])
-            await context.bot.send_message(chat_id=target_id, text=f"📨 پاسخ ادمین:
-
-{update.message.text}")
+            await context.bot.send_message(chat_id=target_id, text=f"📨 پاسخ ادمین: {update.message.text}")
     elif update.message.text.startswith("/add "):
         save_config(update.message.text[5:])
         await update.message.reply_text("✅ کانفیگ ذخیره شد.")
