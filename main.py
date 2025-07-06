@@ -74,9 +74,7 @@ async def forward_to_admin(update: Update, context: CallbackContext):
     elif text == "📨 ارتباط با ادمین":
         await update.message.reply_text("پیامت رو بفرست تا به ادمین فوروارد بشه.")
     else:
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f"📩 پیام از کاربر: {update.effective_user.full_name} 👤 ID: {update.effective_user.id}
-
-{text}")
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"📩 پیام از کاربر: {update.effective_user.full_name} 👤 ID: {update.effective_user.id} {text}")
         await update.message.reply_text("✅ پیامت ارسال شد. منتظر پاسخ باش.")
 
 async def admin_reply(update: Update, context: CallbackContext):
