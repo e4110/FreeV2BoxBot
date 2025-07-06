@@ -87,9 +87,7 @@ async def admin_reply(update: Update, context: CallbackContext):
         save_config(update.message.text[5:])
         await update.message.reply_text("✅ کانفیگ ذخیره شد.")
     elif update.message.text == "/get":
-        await update.message.reply_text(f"📦 آخرین کانفیگ:
-
-{load_config()}")
+        await update.message.reply_text(f"📦 آخرین کانفیگ: {load_config()}")
     elif update.message.text == "/delete":
         save_config("")
         await update.message.reply_text("🗑️ کانفیگ حذف شد.")
