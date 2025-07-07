@@ -82,9 +82,7 @@ async def forward_to_admin(update: Update, context: CallbackContext):
         if await is_user_in_channel(context, user_id):
             config = load_config()
             if config:
-                await update.message.reply_text(f"📦 کانفیگ فعلی:
-
-{config}")
+                await update.message.reply_text(f"📦 کانفیگ فعلی: {config}")
             else:
                 await update.message.reply_text("❌ هنوز هیچ کانفیگی ثبت نشده.")
         else:
@@ -92,9 +90,7 @@ async def forward_to_admin(update: Update, context: CallbackContext):
     elif text == "📨 ارتباط با ادمین":
         await update.message.reply_text("پیامت رو بفرست تا به ادمین فوروارد بشه.")
     else:
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f"📩 پیام از کاربر: {update.effective_user.full_name} 👤 ID: {update.effective_user.id}
-
-{text}")
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"📩 پیام از کاربر: {update.effective_user.full_name} 👤 ID: {update.effective_user.id} {text}")
         await update.message.reply_text("✅ پیامت ارسال شد. منتظر پاسخ باش.")
 
 async def admin_reply(update: Update, context: CallbackContext):
@@ -102,16 +98,12 @@ async def admin_reply(update: Update, context: CallbackContext):
         lines = update.message.reply_to_message.text.split("ID:")
         if len(lines) > 1:
             target_id = int(lines[1].split()[0])
-            await context.bot.send_message(chat_id=target_id, text=f"📨 پاسخ ادمین:
-
-{update.message.text}")
+            await context.bot.send_message(chat_id=target_id, text=f"📨 پاسخ ادمین: {update.message.text}")
     elif update.message.text.startswith("/add "):
         save_config(update.message.text[5:])
         await update.message.reply_text("✅ کانفیگ ذخیره شد.")
     elif update.message.text == "/get":
-        await update.message.reply_text(f"📦 آخرین کانفیگ:
-
-{load_config()}")
+        await update.message.reply_text(f"📦 آخرین کانفیگ: {load_config()}")
     elif update.message.text == "/delete":
         save_config("")
         await update.message.reply_text("🗑️ کانفیگ حذف شد.")
@@ -121,9 +113,7 @@ async def admin_reply(update: Update, context: CallbackContext):
         count = 0
         for uid in users:
             try:
-                await context.bot.send_message(chat_id=uid, text=f"📢 پیام جدید از ادمین:
-
-{msg}")
+                await context.bot.send_message(chat_id=uid, text=f"📢 پیام جدید از ادمین: {msg}")
                 count += 1
             except:
                 continue
