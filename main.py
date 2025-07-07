@@ -113,7 +113,7 @@ async def admin_reply(update: Update, context: CallbackContext):
         count = 0
         for uid in users:
             try:
-                await context.bot.send_message(chat_id=uid, text=f"📢 پیام جدید از ادمین: {msg}")
+                await context.bot.send_message(chat_id=uid, text=f"{msg}")
                 count += 1
             except:
                 continue
