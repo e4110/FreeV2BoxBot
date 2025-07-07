@@ -82,7 +82,7 @@ async def forward_to_admin(update: Update, context: CallbackContext):
         if await is_user_in_channel(context, user_id):
             config = load_config()
             if config:
-                await update.message.reply_text(f"📦 کانفیگ فعلی: {config}")
+                await update.message.reply_text(f"{config}")
             else:
                 await update.message.reply_text("❌ هنوز هیچ کانفیگی ثبت نشده.")
         else:
